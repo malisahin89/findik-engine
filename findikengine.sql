@@ -43,6 +43,7 @@ CREATE TABLE `users` (
 
 --
 -- Tablo döküm verisi `users`
+-- Password: 11223344
 --
 
 INSERT INTO `users` (`id`, `name`, `surname`, `username`, `email`, `password`, `profile_image`, `bio`, `status`, `created_at`, `updated_at`) VALUES
