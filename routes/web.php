@@ -2,6 +2,10 @@
 
 use Core\Route;
 
+
+// CSRF kontrolü olmasın isterseniz
+// Route::post('/api/endpoint', 'ApiController@store')->middleware('api');
+
 Route::get('/', 'HomeController@index')->name('home');
 
 Route::prefix('/admin')->group(function () {

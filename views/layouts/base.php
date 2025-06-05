@@ -2,50 +2,20 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title><?= $this->e($title ?? 'Yönetim Paneli') ?></title>
-    <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $this->e($title ?? 'Findik Engine') ?></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
 </head>
-<body>
-
-<header>
-    <div>FindikEngine</div>
-    <div>
-        <?php if (auth()): ?>
-            Hoş geldin, <?= auth()->name ?> |
-            <a href="<?= route('admin.logout') ?>" style="color: #fff;">Çıkış</a>
-        <?php endif; ?>
-    </div>
-</header>
-
-<div class="sidebar">
-    <a href="<?= route('admin.users.index') ?>">👥 Kullanıcılar</a>
-    <a href="#">📦 Ürünler</a>
-    <a href="#">⚙️ Ayarlar</a>
-</div>
-
-<div class="main-content">
-    <?php if ($success): ?>
-        <div class="alert alert-success"><?= $success ?></div>
-    <?php endif; ?>
-
-    <?php if ($error): ?>
-        <div class="alert alert-error"><?= $error ?></div>
-    <?php endif; ?>
-
-    <?php if (!empty($errors)): ?>
-        <div class="alert alert-error">
-            <ul>
-                <?php foreach ($errors as $fieldErrors): ?>
-                    <?php foreach ($fieldErrors as $error): ?>
-                        <li><?= $error ?></li>
-                    <?php endforeach; ?>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    <?php endif; ?>
-
+<body class="bg-gray-100">
     <?= $this->section('body') ?>
-</div>
-
+    
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
 </body>
 </html>

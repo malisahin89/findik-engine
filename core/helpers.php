@@ -36,7 +36,7 @@ if (!function_exists('redirect')) {
 if (!function_exists('asset')) {
     function asset($path)
     {
-        return '/public/' . ltrim($path, '/');
+        return '/' . ltrim($path, '/');
     }
 }
 

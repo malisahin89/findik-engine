@@ -82,6 +82,25 @@ class Route
         return self::$namedRoutes[$name] ?? '#';
     }
 
+    // Middleware çalıştır
+    protected static function runMiddleware($middlewareName, $request = null)
+    {
+        // Önce app/Middleware'de ara
+        $middlewareClass = "\\App\\Middleware\\" . ucfirst($middlewareName) . "Middleware";
+        
+        // Bulunamazsa core/Middleware'de ara
+        if (!class_exists($middlewareClass)) {
+            $middlewareClass = "\\Core\\Middleware\\" . ucfirst($middlewareName);
+        }
+        
+        if (class_exists($middlewareClass)) {
+            $middleware = new $middlewareClass();
+            return $middleware->handle($request, function($request) { return $request; });
+        }
+        
+        die("Middleware bulunamadı: $middlewareName");
+    }
+
     // Rotaları çalıştır
     public static function dispatch()
     {
@@ -95,16 +114,20 @@ class Route
         }
 
         $route = self::$routes[$method][$uri];
+        $request = $_REQUEST;
 
-        // Middleware'leri çalıştır
+        // Global middleware'ler (tüm isteklerde çalışır)
+        $globalMiddlewares = ['VerifyCsrfToken'];
+        
+        // Global middleware'leri çalıştır
+        foreach ($globalMiddlewares as $middleware) {
+            self::runMiddleware($middleware, $request);
+        }
+
+        // Rota özel middleware'leri çalıştır
         if (!empty($route['middleware'])) {
             foreach ($route['middleware'] as $middleware) {
-                $middlewareClass = "\\App\\Middleware\\" . ucfirst($middleware) . "Middleware";
-                if (class_exists($middlewareClass)) {
-                    $middlewareClass::handle();
-                } else {
-                    die("Middleware bulunamadı: $middlewareClass");
-                }
+                self::runMiddleware($middleware, $request);
             }
         }
 

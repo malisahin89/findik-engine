@@ -3,8 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\User;
-use Core\View;
 use Core\Csrf;
+use Core\View;
 
 class UserController
 {
@@ -21,11 +21,14 @@ class UserController
 
     public function store()
     {
-        if (!Csrf::check($_POST['csrf_token'])) {
-            die('CSRF koruması: Token doğrulanamadı.');
+        $request = $_POST;
+        
+        // Eğer status 'passive' olarak gelirse, 'inactive' olarak değiştir
+        if (isset($request['status']) && $request['status'] === 'passive') {
+            $request['status'] = 'inactive';
         }
-
-        $errors = validate($_POST, [
+        
+        $errors = validate($request, [
             'name' => 'required',
             'surname' => 'required',
             'username' => 'required|unique:users,username',
@@ -33,16 +36,28 @@ class UserController
             'password' => 'required',
             // 'profile_image' => 'required',
             'bio' => 'required',
-            'status' => 'required',
+            'status' => 'required|in:active,inactive',
         ]);
 
         if ($errors) {
-            View::render('users/create', ['errors' => $errors]);
+            View::render('users/create', [
+                'errors' => $errors,
+                'old' => $request
+            ]);
             return;
         }
 
-        User::create($_POST);
-        flash('success', 'Kullanıcı başarıyla eklendi!');
+        $userData = $request;
+        $userData['password'] = password_hash($userData['password'], PASSWORD_DEFAULT);
+        
+        // Varsayılan resim yolu
+        if (empty($userData['profile_image'])) {
+            $userData['profile_image'] = 'default.png';
+        }
+        
+        User::create($userData);
+
+        flash('success', 'Kullanıcı başarıyla oluşturuldu!');
         redirect('admin.users.index');
     }
 
@@ -54,46 +69,48 @@ class UserController
 
     public function update()
     {
-        if (!Csrf::check($_POST['csrf_token'])) {
-            die('CSRF koruması: Token doğrulanamadı.');
+        $request = $_POST;
+        $userId = $request['id'];
+        
+        // Eğer status 'passive' olarak gelirse, 'inactive' olarak değiştir
+        if (isset($request['status']) && $request['status'] === 'passive') {
+            $request['status'] = 'inactive';
         }
-    
-        $userId = $_POST['id'];
-    
-        $errors = validate($_POST, [
-            'name'     => 'required',
-            'surname'  => 'required',
+
+        $errors = validate($request, [
+            'name' => 'required',
+            'surname' => 'required',
             'username' => 'required|unique:users,username,' . $userId,
-            'email'    => 'required|email|unique:users,email,' . $userId,
-            'bio'      => 'required',
-            'status'   => 'required',
+            'email' => 'required|email|unique:users,email,' . $userId,
+            'bio' => 'required',
+            'status' => 'required|in:active,inactive',
         ]);
-    
+
         if ($errors) {
             $user = User::find($userId);
             View::render('users/edit', [
                 'errors' => $errors,
-                'user'   => $user
+                'user' => (object) array_merge((array) $user->toArray(), $request)
             ]);
             return;
         }
-    
-        $data = $_POST;
-    
+
+
+        $data = $request;
+
         // Şifre varsa hashle, yoksa sil
         if (!empty($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         } else {
             unset($data['password']);
         }
-    
+
         $user = User::find($userId);
         $user->update($data);
-    
+
         flash('success', 'Kullanıcı başarıyla güncellendi!');
         redirect('admin.users.index');
     }
-    
 
     public function delete()
     {
