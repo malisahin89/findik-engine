@@ -25,9 +25,12 @@
                     <a href="<?= route('admin.users.index') ?>" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium">
                         Yönetim Paneli
                     </a>
-                    <a href="<?= route('admin.logout') ?>" class="ml-4 text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-                        Çıkış Yap
-                    </a>
+                    <form method="POST" action="<?= route('admin.logout') ?>" class="inline ml-4">
+                        <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                        <button type="submit" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                            Çıkış Yap
+                        </button>
+                    </form>
                 <?php else: ?>
                     <a href="<?= route('admin.login.show') ?>" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
                         Giriş Yap
@@ -48,11 +51,10 @@
             <a href="/" class="bg-indigo-50 border-indigo-500 text-indigo-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Ana Sayfa</a>
             <a href="#" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Hakkımızda</a>
             <a href="#" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">İletişim</a>
-            <?php if (auth()): ?>
-                <a href="<?= route('admin.dashboard') ?>" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Yönetim Paneli</a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="<?= route('admin.users.index') ?>" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Yönetim Paneli</a>
             <?php else: ?>
-                <a href="<?= route('login') ?>" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Giriş Yap</a>
-                <a href="<?= route('register') ?>" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Kayıt Ol</a>
+                <a href="<?= route('admin.login.show') ?>" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Giriş Yap</a>
             <?php endif; ?>
         </div>
     </div>
@@ -75,7 +77,7 @@
         </div>
     <?php endif; ?>
 
-    <?= $this->section('body') ?>
+    <?= $this->section('main') ?>
 </main>
 
 <footer class="bg-white mt-12">
@@ -99,4 +101,11 @@
         </p>
     </div>
 </footer>
+
+<script>
+function toggleMenu() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
+}
+</script>
 <?php $this->end() ?>

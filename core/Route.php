@@ -98,7 +98,7 @@ class Route
             return $middleware->handle($request, function($request) { return $request; });
         }
         
-        die("Middleware bulunamadı: $middlewareName");
+        throw new \Exception("Middleware bulunamadı: $middlewareName");
     }
 
     // Rotaları çalıştır
@@ -108,8 +108,7 @@ class Route
         $method = $_SERVER['REQUEST_METHOD'];
 
         if (!isset(self::$routes[$method][$uri])) {
-            http_response_code(404);
-            echo "404 - Not Found: $uri";
+            \Core\Response::notFound();
             return;
         }
 
@@ -117,7 +116,7 @@ class Route
         $request = $_REQUEST;
 
         // Global middleware'ler (tüm isteklerde çalışır)
-        $globalMiddlewares = ['VerifyCsrfToken'];
+        $globalMiddlewares = ['SecurityHeaders', 'VerifyCsrfToken'];
         
         // Global middleware'leri çalıştır
         foreach ($globalMiddlewares as $middleware) {
@@ -132,11 +131,18 @@ class Route
         }
 
         [$controller, $methodName] = explode('@', $route['action']);
+        
+        // Güvenlik: Controller ve method adlarını doğrula
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $controller) || 
+            !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $methodName)) {
+            \Core\Response::serverError('Geçersiz controller veya metot adı!');
+            return;
+        }
+        
         $controller = "App\\Controllers\\$controller";
 
         if (!class_exists($controller) || !method_exists($controller, $methodName)) {
-            http_response_code(500);
-            echo "Controller veya metot bulunamadı!";
+            \Core\Response::serverError('Controller veya metot bulunamadı!');
             return;
         }
 

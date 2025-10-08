@@ -11,7 +11,7 @@ Route::get('/', 'HomeController@index')->name('home');
 Route::prefix('/admin')->group(function () {
     Route::get('/login', 'AuthController@showLogin')->name('admin.login.show');
     Route::post('/login', 'AuthController@login')->name('admin.login.do');
-    Route::get('/logout', 'AuthController@logout')->middleware('auth')->name('admin.logout');
+    Route::post('/logout', 'AuthController@logout')->middleware('auth')->name('admin.logout');
 });
 
 Route::prefix('/admin')->group(function () {
@@ -34,8 +34,34 @@ Route::prefix('/admin')->group(function () {
             ->middleware('auth')
             ->name('admin.users.update');
 
-        Route::get('/delete', 'UserController@delete')
+        Route::post('/delete', 'UserController@delete')
             ->middleware('auth')
             ->name('admin.users.delete');
+    });
+    
+    Route::prefix('/posts')->group(function () {
+        Route::get('/', 'PostController@index')
+            ->middleware('auth')
+            ->name('admin.posts.index');
+
+        Route::get('/create', 'PostController@create')
+            ->middleware('auth')
+            ->name('admin.posts.create');
+
+        Route::post('/store', 'PostController@store')
+            ->middleware('auth')
+            ->name('admin.posts.store');
+
+        Route::get('/edit', 'PostController@edit')
+            ->middleware('auth')
+            ->name('admin.posts.edit');
+
+        Route::post('/update', 'PostController@update')
+            ->middleware('auth')
+            ->name('admin.posts.update');
+
+        Route::post('/delete', 'PostController@delete')
+            ->middleware('auth')
+            ->name('admin.posts.delete');
     });
 });

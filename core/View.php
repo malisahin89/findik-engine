@@ -24,7 +24,27 @@ class View
 
         // CSRF fonksiyonu
         $templates->registerFunction('csrf', function () {
-            return '<input type="hidden" name="csrf_token" value="' . Csrf::generate() . '">';
+            return '<input type="hidden" name="csrf_token" value="' . \Core\Csrf::generate() . '">';
+        });
+        
+        // CSRF token fonksiyonu
+        $templates->registerFunction('csrf_token', function () {
+            return \Core\Csrf::generate();
+        });
+        
+        // XSS koruması için escape fonksiyonu
+        $templates->registerFunction('e', function ($string) {
+            return htmlspecialchars($string ?? '', ENT_QUOTES, 'UTF-8');
+        });
+        
+        // Güvenli URL fonksiyonu
+        $templates->registerFunction('url', function ($name) {
+            return htmlspecialchars(route($name), ENT_QUOTES, 'UTF-8');
+        });
+        
+        // Old input fonksiyonu (XSS korumalı)
+        $templates->registerFunction('old', function ($key, $default = '') {
+            return htmlspecialchars(old($key, $default), ENT_QUOTES, 'UTF-8');
         });
 
         echo $templates->render($template, $data);

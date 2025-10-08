@@ -1,6 +1,6 @@
 <?php $this->layout('layouts/main', ['title' => 'Ana Sayfa']) ?>
 
-<?php $this->start('body') ?>
+<?php $this->start('main') ?>
 <!-- Hero Section -->
 <div class="bg-white">
     <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8 text-center">
@@ -30,9 +30,12 @@
                     </a>
                 </div>
                 <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                    <a href="<?= route('admin.logout') ?>" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10">
-                        Çıkış Yap
-                    </a>
+                    <form method="POST" action="<?= route('admin.logout') ?>" class="inline">
+                        <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                        <button type="submit" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10">
+                            Çıkış Yap
+                        </button>
+                    </form>
                 </div>
             <?php endif; ?>
         </div>
@@ -57,8 +60,14 @@
                 <?php foreach ($users as $user): ?>
                     <li class="px-6 py-4 hover:bg-gray-50 transition duration-150 ease-in-out">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                                <span class="text-indigo-600 font-medium"><?= strtoupper(substr($user->name, 0, 1) . substr($user->surname, 0, 1)) ?></span>
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <?php if ($user->profile_image && $user->profile_image !== 'default.png'): ?>
+                                    <img class="h-10 w-10 rounded-full object-cover" src="/<?= htmlspecialchars($user->profile_image) ?>" alt="<?= htmlspecialchars($user->name) ?>">
+                                <?php else: ?>
+                                    <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                        <span class="text-indigo-600 font-medium"><?= strtoupper(substr($user->name, 0, 1) . substr($user->surname, 0, 1)) ?></span>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                             <div class="ml-4">
                                 <div class="text-sm font-medium text-gray-900">

@@ -25,7 +25,7 @@ if (!function_exists('redirect')) {
         }
 
         header("Location: $url");
-        exit;
+        throw new \Core\RedirectException();
     }
 }
 
@@ -98,7 +98,26 @@ if (!function_exists('validate')) {
                 if ($ruleName === 'same' && $value !== ($data[$param] ?? '')) {
                     $errors[$field][] = "$field ile $param eşleşmiyor.";
                 }
+                
+                if ($ruleName === 'in') {
+                    $allowedValues = explode(',', $param);
+                    if (!in_array($value, $allowedValues)) {
+                        $errors[$field][] = "$field geçersiz bir değer içeriyor.";
+                    }
+                }
+                
+                if ($ruleName === 'alpha' && !preg_match('/^[a-zA-ZÇçĞğİıÖöŞşÜü\s]+$/', $value)) {
+                    $errors[$field][] = "$field sadece harf içermelidir.";
+                }
+                
+                if ($ruleName === 'alphanumeric' && !preg_match('/^[a-zA-Z0-9ÇçĞğİıÖöŞşÜü]+$/', $value)) {
+                    $errors[$field][] = "$field sadece harf ve rakam içermelidir.";
+                }
 
+                if ($ruleName === 'url' && !filter_var($value, FILTER_VALIDATE_URL)) {
+                    $errors[$field][] = "$field geçerli bir URL olmalı.";
+                }
+                
                 if ($ruleName === 'unique') {
                     // unique:users,email,5 → tablo, kolon, hariç tutulacak ID
                     $parts = explode(',', $param);
@@ -106,12 +125,19 @@ if (!function_exists('validate')) {
                     $column = $parts[1] ?? null;
                     $ignoreId = $parts[2] ?? null;
 
-                    if ($value !== '' && $table && $column) {
+                    // Güvenlik: Sadece izin verilen tablo ve kolon adlarını kabul et
+                    $allowedTables = ['users'];
+                    $allowedColumns = ['username', 'email'];
+                    
+                    if ($value !== '' && $table && $column && 
+                        in_array($table, $allowedTables) && 
+                        in_array($column, $allowedColumns)) {
+                        
                         $query = \Illuminate\Database\Capsule\Manager::table($table)
                             ->where($column, $value);
 
-                        if ($ignoreId) {
-                            $query->where('id', '!=', $ignoreId);
+                        if ($ignoreId && is_numeric($ignoreId)) {
+                            $query->where('id', '!=', (int)$ignoreId);
                         }
 
                         $count = $query->count();
@@ -144,6 +170,35 @@ if (!function_exists('old')) {
         $old = $_SESSION['_old'] ?? [];
 
         return $old[$key] ?? $default;
+    }
+}
+
+if (!function_exists('csrf')) {
+    function csrf()
+    {
+        return \Core\Csrf::generate();
+    }
+}
+
+if (!function_exists('csrf_token')) {
+    function csrf_token()
+    {
+        return \Core\Csrf::generate();
+    }
+}
+
+if (!function_exists('cache')) {
+    function cache($key = null, $value = null, $ttl = 3600)
+    {
+        if ($key === null) {
+            return new \Core\Cache();
+        }
+        
+        if ($value === null) {
+            return \Core\Cache::get($key);
+        }
+        
+        return \Core\Cache::set($key, $value, $ttl);
     }
 }
 

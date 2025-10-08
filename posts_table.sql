@@ -1,0 +1,22 @@
+CREATE TABLE `posts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `content` longtext NOT NULL,
+  `short_description` text,
+  `cover_image` varchar(255) DEFAULT NULL,
+  `gallery_images` json DEFAULT NULL,
+  `status` enum('draft','published') DEFAULT 'draft',
+  `is_featured` tinyint(1) DEFAULT 0,
+  `comment_enabled` tinyint(1) DEFAULT 1,
+  `order` int(11) DEFAULT 0,
+  `user_id` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`),
+  KEY `status` (`status`),
+  KEY `is_featured` (`is_featured`),
+  KEY `user_id` (`user_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

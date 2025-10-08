@@ -7,7 +7,7 @@ class Redirect
     public static function to($url)
     {
         header("Location: $url");
-        exit;
+        throw new RedirectException();
     }
 
     public static function route($name)

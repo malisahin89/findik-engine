@@ -10,7 +10,7 @@ class AuthMiddleware
 
         if (empty($_SESSION['user_id'])) {
             redirect('admin.login.show');
-            exit;
+            return;
         }
     }
 }

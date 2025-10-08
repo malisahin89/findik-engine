@@ -1,1 +1,7 @@
 /vendor/
+.env
+*.log
+/storage/logs/*.log
+/storage/cache/*.cache
+/public/uploads/*
+!/public/uploads/.gitkeep

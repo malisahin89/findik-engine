@@ -38,9 +38,13 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-                                            <i class="fas fa-user"></i>
-                                        </div>
+                                        <?php if ($user->profile_image && $user->profile_image !== 'default.png'): ?>
+                                            <img class="h-10 w-10 rounded-full object-cover" src="/<?= htmlspecialchars($user->profile_image) ?>" alt="<?= htmlspecialchars($user->name) ?>">
+                                        <?php else: ?>
+                                            <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900">

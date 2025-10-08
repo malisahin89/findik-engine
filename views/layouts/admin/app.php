@@ -11,7 +11,7 @@
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
                         <a href="<?= route('admin.users.index') ?>" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Kullanıcılar</a>
-                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Ürünler</a>
+                        <a href="<?= route('admin.posts.index') ?>" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Blog</a>
                         <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Ayarlar</a>
                     </div>
                 </div>
@@ -36,7 +36,7 @@
     <div id="mobile-menu" class="hidden md:hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <a href="<?= route('admin.users.index') ?>" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700">Kullanıcılar</a>
-            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700">Ürünler</a>
+            <a href="<?= route('admin.posts.index') ?>" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700">Blog</a>
             <a href="#" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700">Ayarlar</a>
             <?php if (auth()): ?>
                 <a href="<?= route('admin.logout') ?>" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700">Çıkış Yap</a>
@@ -46,15 +46,15 @@
 </nav>
 
 <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <?php if (isset($success)): ?>
+    <?php if (flash('success')): ?>
         <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline"><?= $success ?></span>
+            <span class="block sm:inline"><?= htmlspecialchars(flash('success')) ?></span>
         </div>
     <?php endif; ?>
 
-    <?php if (isset($error)): ?>
+    <?php if (flash('error')): ?>
         <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline"><?= $error ?></span>
+            <span class="block sm:inline"><?= htmlspecialchars(flash('error')) ?></span>
         </div>
     <?php endif; ?>
 
@@ -72,4 +72,11 @@
 
     <?= $this->section('body') ?>
 </main>
+
+<script>
+function toggleMenu() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
+}
+</script>
 <?php $this->end() ?>
