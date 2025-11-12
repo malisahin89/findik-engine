@@ -13,20 +13,13 @@ class PostController
     public function index()
     {
         $posts = Cache::remember('posts_list', 300, function() {
-            return \Illuminate\Database\Capsule\Manager::table('posts')
-                ->leftJoin('users', 'posts.user_id', '=', 'users.id')
-                ->select('posts.*', 'users.name as user_name')
-                ->orderBy('posts.created_at', 'desc')
-                ->get();
+            return Post::orderBy('created_at', 'desc')->get();
         });
         
-        // Convert to objects with user property
-        $posts = array_map(function($post) {
-            $postObj = (object) $post;
-            $postObj->user = (object) ['name' => $post->user_name ?? 'Bilinmiyor'];
-            $postObj->gallery_images = $post->gallery_images ? json_decode($post->gallery_images, true) : [];
-            return $postObj;
-        }, $posts->toArray());
+        // Load user relationships
+        foreach ($posts as $post) {
+            $post->user = $post->user()->get();
+        }
         
         View::render('posts/index', ['posts' => $posts]);
     }
@@ -105,12 +98,12 @@ class PostController
         }
         $postData['gallery_images'] = $galleryImages;
         
-        $newPostId = Post::createPost($postData);
+        $newPost = Post::create($postData);
         
         Cache::forget('posts_list');
         
         Logger::info('Post created', [
-            'post_id' => $newPostId,
+            'post_id' => $newPost->id,
             'created_by' => $_SESSION['user_id'] ?? 'unknown'
         ]);
 
@@ -127,7 +120,7 @@ class PostController
             return;
         }
         
-        $post = Post::findPost($id);
+        $post = Post::find($id);
         if (!$post) {
             flash('error', 'Post bulunamadı!');
             redirect('admin.posts.index');
@@ -162,7 +155,7 @@ class PostController
         ]);
 
         if ($errors) {
-            $post = Post::findPost($postId);
+            $post = Post::find($postId);
             View::render('posts/edit', [
                 'errors' => $errors,
                 'post' => (object) array_merge((array) $post, $request)
@@ -182,7 +175,7 @@ class PostController
             try {
                 $data['cover_image'] = FileUpload::upload($_FILES['cover_image'], 'uploads/posts');
             } catch (\Exception $e) {
-                $post = Post::findPost($postId);
+                $post = Post::find($postId);
                 View::render('posts/edit', [
                     'errors' => ['cover_image' => [$e->getMessage()]],
                     'post' => (object) array_merge((array) $post, $request)
@@ -191,14 +184,14 @@ class PostController
             }
         }
 
-        $post = Post::findPost($postId);
+        $post = Post::find($postId);
         if (!$post) {
             flash('error', 'Post bulunamadı!');
             redirect('admin.posts.index');
             return;
         }
         
-        Post::updatePost($postId, $data);
+        $post->update($data);
         
         Cache::forget('posts_list');
         
@@ -220,14 +213,14 @@ class PostController
             return;
         }
         
-        $post = Post::findPost($id);
+        $post = Post::find($id);
         if (!$post) {
             flash('error', 'Post bulunamadı!');
             redirect('admin.posts.index');
             return;
         }
         
-        Post::deletePost($id);
+        $post->delete();
         
         Cache::forget('posts_list');
         

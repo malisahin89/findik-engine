@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Capsule\Manager as DB;
+use Core\Model;
+use Core\Relations\BelongsToRelation;
 
 class Post extends Model
 {
@@ -56,45 +56,6 @@ class Post extends Model
     // Relation: Yazar
     public function user()
     {
-        return $this->belongsTo(User::class);
-    }
-    
-    // Custom methods
-    public static function getAllPosts()
-    {
-        return DB::table('posts')->orderBy('created_at', 'desc')->get();
-    }
-    
-    public static function findPost($id)
-    {
-        return DB::table('posts')->where('id', $id)->first();
-    }
-    
-    public static function createPost($data)
-    {
-        $data['created_at'] = date('Y-m-d H:i:s');
-        $data['updated_at'] = date('Y-m-d H:i:s');
-        
-        if (isset($data['gallery_images'])) {
-            $data['gallery_images'] = json_encode($data['gallery_images']);
-        }
-        
-        return DB::table('posts')->insertGetId($data);
-    }
-    
-    public static function updatePost($id, $data)
-    {
-        $data['updated_at'] = date('Y-m-d H:i:s');
-        
-        if (isset($data['gallery_images'])) {
-            $data['gallery_images'] = json_encode($data['gallery_images']);
-        }
-        
-        return DB::table('posts')->where('id', $id)->update($data);
-    }
-    
-    public static function deletePost($id)
-    {
-        return DB::table('posts')->where('id', $id)->delete();
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

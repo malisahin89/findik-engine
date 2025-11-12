@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Core\Model;
+use Core\Relations\HasManyRelation;
 
 class User extends Model
 {
@@ -49,5 +50,11 @@ class User extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+    
+    // Relation: Posts
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'user_id', 'id');
     }
 }

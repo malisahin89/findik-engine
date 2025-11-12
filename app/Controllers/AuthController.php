@@ -86,6 +86,8 @@ class AuthController
 
     public function logout()
     {
+        $userId = $_SESSION['user_id'] ?? 'unknown';
+        
         // Güvenli logout
         $_SESSION = [];
         
@@ -97,10 +99,10 @@ class AuthController
             );
         }
         
-        Logger::info('User logout', ['user_id' => $_SESSION['user_id'] ?? 'unknown']);
-        
         session_destroy();
         session_start(); // Flash mesaj için yeniden başlat
+        
+        Logger::info('User logout', ['user_id' => $userId]);
         
         flash('success', 'Çıkış yapıldı!');
         redirect('admin.login.show');
