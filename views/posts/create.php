@@ -31,18 +31,28 @@
 
             <!-- Slug -->
             <div class="space-y-2">
-                <label class="block text-gray-700">Slug:</label>
-                <input type="text" name="slug" value="<?= old('slug') ?>" 
-                       class="border rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-blue-500" 
-                       placeholder="SEO dostu URL">
+                <label class="block text-gray-700">Slug (SEO URL):</label>
+                <input type="text" name="slug" value="<?= old('slug') ?>"
+                       class="border rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                       placeholder="ornek-blog-yazisi">
+                <p class="text-sm text-gray-500">Boş bırakılırsa başlıktan otomatik oluşturulur. Resimler bu slug ile adlandırılır.</p>
             </div>
 
             <!-- Kısa Açıklama -->
             <div class="space-y-2">
                 <label class="block text-gray-700">Kısa Açıklama:</label>
-                <textarea name="short_description" rows="3" 
-                          class="border rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-blue-500" 
+                <textarea name="short_description" rows="3"
+                          class="border rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-blue-500"
                           placeholder="Özet bilgi"><?= old('short_description') ?></textarea>
+            </div>
+
+            <!-- Meta Keywords (SEO) -->
+            <div class="space-y-2">
+                <label class="block text-gray-700">Anahtar Kelimeler (SEO):</label>
+                <input type="text" name="meta_keywords" value="<?= old('meta_keywords') ?>"
+                       class="border rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                       placeholder="laravel, php, web geliştirme, blog">
+                <p class="text-sm text-gray-500">Virgülle ayırarak yazın. SEO için önemli.</p>
             </div>
 
             <!-- İçerik -->
@@ -58,8 +68,9 @@
                 <label class="block text-gray-700">Kapak Fotoğrafı:</label>
                 <div class="flex items-center space-x-4">
                     <div class="flex-1">
-                        <input type="file" name="cover_image" id="cover_image" accept="image/*" 
+                        <input type="file" name="cover_image" id="cover_image" accept="image/*"
                                class="border rounded-lg w-full px-3 py-2" onchange="previewCover(event)">
+                        <p class="text-sm text-gray-500 mt-1">WebP formatında %70 kalite ile kaydedilir.</p>
                     </div>
                 </div>
                 <div id="cover-preview" class="hidden mt-2">
@@ -70,8 +81,9 @@
             <!-- Galeri Fotoğrafları -->
             <div class="space-y-2">
                 <label class="block text-gray-700">Galeri Fotoğrafları:</label>
-                <input type="file" name="gallery_images[]" multiple accept="image/*" 
+                <input type="file" name="gallery_images[]" multiple accept="image/*"
                        class="border rounded-lg w-full px-3 py-2" onchange="previewGallery(event)">
+                <p class="text-sm text-gray-500">Birden fazla resim seçebilirsiniz. WebP formatında %70 kalite ile kaydedilir.</p>
                 <div id="gallery-preview" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4"></div>
             </div>
 

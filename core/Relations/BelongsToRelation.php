@@ -2,20 +2,8 @@
 
 namespace Core\Relations;
 
-class BelongsToRelation extends Relation
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class BelongsToRelation extends BelongsTo
 {
-    public function __construct($related, $foreignKey, $ownerKey, $parent)
-    {
-        parent::__construct($related, $foreignKey, $ownerKey, $parent);
-    }
-
-    public function get()
-    {
-        $foreignValue = $this->parent->{$this->foreignKey};
-        if (!$foreignValue) {
-            return null;
-        }
-
-        return $this->related::where($this->localKey, $foreignValue)->first();
-    }
 }

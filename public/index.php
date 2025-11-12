@@ -30,11 +30,16 @@ if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time']) > 1800)
 
 try {
     Middleware::handle();
-    
+
     require_once BASE_PATH . '/routes/web.php';
-    
+
     Route::dispatch();
-    
+
+    // Flash message ve old input auto-cleanup
+    if (isset($_SESSION['_old'])) {
+        unset($_SESSION['_old']);
+    }
+
 } catch (\Core\RedirectException $e) {
     // Redirect exception - normal akış
     exit;
@@ -52,8 +57,9 @@ try {
         'line' => $e->getLine(),
         'trace' => $e->getTraceAsString()
     ]);
-    
-    if (($_ENV['APP_DEBUG'] ?? 'true') === 'true') {
+
+    // Güvenlik: Production'da hata detaylarını gösterme
+    if (($_ENV['APP_DEBUG'] ?? 'false') === 'true') {
         echo '<pre>' . htmlspecialchars($e->getMessage() . "\n" . $e->getTraceAsString()) . '</pre>';
     } else {
         echo 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.';

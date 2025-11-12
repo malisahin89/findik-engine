@@ -8,6 +8,7 @@
   },
   "require": {
     "illuminate/database": "^10.0",
-    "league/plates": "^3.4"
+    "league/plates": "^3.4",
+    "vlucas/phpdotenv": "^5.6"
   }
 }

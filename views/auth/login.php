@@ -68,7 +68,7 @@
                     </div>
 
                     <div class="text-sm">
-                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                        <a href="<?= route('admin.password.forgot') ?>" class="font-medium text-indigo-600 hover:text-indigo-500">
                             Şifremi Unuttum?
                         </a>
                     </div>

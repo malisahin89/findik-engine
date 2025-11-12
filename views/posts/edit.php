@@ -32,18 +32,28 @@
 
             <!-- Slug -->
             <div class="space-y-2">
-                <label class="block text-gray-700">Slug:</label>
-                <input type="text" name="slug" value="<?= htmlspecialchars($post->slug) ?>" 
-                       class="border rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-blue-500" 
-                       placeholder="SEO dostu URL">
+                <label class="block text-gray-700">Slug (SEO URL):</label>
+                <input type="text" name="slug" value="<?= htmlspecialchars($post->slug) ?>"
+                       class="border rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                       placeholder="ornek-blog-yazisi">
+                <p class="text-sm text-gray-500">Slug değişirse tüm resimler otomatik yeniden adlandırılır.</p>
             </div>
 
             <!-- Kısa Açıklama -->
             <div class="space-y-2">
                 <label class="block text-gray-700">Kısa Açıklama:</label>
-                <textarea name="short_description" rows="3" 
-                          class="border rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-blue-500" 
+                <textarea name="short_description" rows="3"
+                          class="border rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-blue-500"
                           placeholder="Özet bilgi"><?= htmlspecialchars($post->short_description) ?></textarea>
+            </div>
+
+            <!-- Meta Keywords (SEO) -->
+            <div class="space-y-2">
+                <label class="block text-gray-700">Anahtar Kelimeler (SEO):</label>
+                <input type="text" name="meta_keywords" value="<?= htmlspecialchars($post->meta_keywords ?? '') ?>"
+                       class="border rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                       placeholder="laravel, php, web geliştirme, blog">
+                <p class="text-sm text-gray-500">Virgülle ayırarak yazın. SEO için önemli.</p>
             </div>
 
             <!-- İçerik -->
@@ -61,11 +71,15 @@
                     <?php if ($post->cover_image): ?>
                         <div class="relative group">
                             <img src="/<?= htmlspecialchars($post->cover_image) ?>" class="h-32 w-32 object-cover rounded-lg shadow" id="cover-preview">
+                            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-lg">
+                                Mevcut Resim
+                            </div>
                         </div>
                     <?php endif; ?>
                     <div class="flex-1">
-                        <input type="file" name="cover_image" id="cover_image" accept="image/*" 
+                        <input type="file" name="cover_image" id="cover_image" accept="image/*"
                                class="border rounded-lg w-full px-3 py-2" onchange="previewCover(event)">
+                        <p class="text-sm text-gray-500 mt-1">Yeni resim yüklerseniz eski resim otomatik silinir. WebP formatında %70 kalite ile kaydedilir.</p>
                     </div>
                 </div>
             </div>
@@ -73,22 +87,40 @@
             <!-- Galeri Fotoğrafları -->
             <div class="space-y-2">
                 <label class="block text-gray-700">Galeri Fotoğrafları:</label>
-                <input type="file" name="gallery_images[]" multiple accept="image/*" 
+                <input type="file" name="gallery_images[]" multiple accept="image/*"
                        class="border rounded-lg w-full px-3 py-2" onchange="previewGallery(event)">
-                
+                <p class="text-sm text-gray-500">Yeni resimler mevcut galeriye eklenir. WebP formatında %70 kalite ile kaydedilir.</p>
+
                 <!-- Mevcut Galeri -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4" id="gallery-preview">
-                    <?php 
-                    $galleryImages = $post->gallery_images ? json_decode($post->gallery_images, true) : [];
-                    if (!empty($galleryImages) && is_array($galleryImages)): 
-                    ?>
-                        <?php foreach ($galleryImages as $image): ?>
-                            <div class="relative group">
+                <?php
+                $galleryImages = $post->gallery_images ?? [];
+                if (!empty($galleryImages) && is_array($galleryImages)):
+                ?>
+                <div class="mt-4">
+                    <p class="text-sm font-medium text-gray-700 mb-2">Mevcut Galeri Resimleri (<?= count($galleryImages) ?>):</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="gallery-preview">
+                        <?php foreach ($galleryImages as $index => $image): ?>
+                            <div class="relative group" id="gallery-item-<?= $index ?>">
                                 <img src="/<?= htmlspecialchars($image) ?>" class="w-full h-32 object-cover rounded-lg shadow">
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-lg text-center">
+                                    Resim #<?= $index + 1 ?>
+                                </div>
+                                <div class="absolute top-2 right-2">
+                                    <label class="flex items-center bg-red-600 text-white px-2 py-1 rounded cursor-pointer hover:bg-red-700">
+                                        <input type="checkbox" name="delete_gallery_images[]" value="<?= $index ?>" class="mr-1">
+                                        <span class="text-xs">Sil</span>
+                                    </label>
+                                </div>
                             </div>
                         <?php endforeach; ?>
-                    <?php endif; ?>
+                    </div>
+                    <p class="text-xs text-red-600 mt-2">İşaretli resimleri silmek için "Güncelle" butonuna basın.</p>
                 </div>
+                <?php else: ?>
+                <div class="mt-4" id="gallery-preview">
+                    <p class="text-sm text-gray-500">Henüz galeri resmi eklenmemiş.</p>
+                </div>
+                <?php endif; ?>
             </div>
 
             <!-- Diğer Alanlar -->

@@ -55,6 +55,6 @@ class User extends Model
     // Relation: Posts
     public function posts()
     {
-        return $this->hasMany(Post::class, 'user_id', 'id');
+        return $this->hasMany(Post::class);
     }
 }

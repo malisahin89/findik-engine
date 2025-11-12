@@ -12,6 +12,12 @@ Route::prefix('/admin')->group(function () {
     Route::get('/login', 'AuthController@showLogin')->name('admin.login.show');
     Route::post('/login', 'AuthController@login')->name('admin.login.do');
     Route::post('/logout', 'AuthController@logout')->middleware('auth')->name('admin.logout');
+
+    // Password Reset Routes
+    Route::get('/forgot-password', 'AuthController@showForgotPassword')->name('admin.password.forgot');
+    Route::post('/forgot-password', 'AuthController@sendResetLink')->name('admin.password.email');
+    Route::get('/reset-password', 'AuthController@showResetPassword')->name('admin.password.reset');
+    Route::post('/reset-password', 'AuthController@resetPassword')->name('admin.password.update');
 });
 
 Route::prefix('/admin')->group(function () {

@@ -1,21 +1,13 @@
 <?php
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Dotenv\Dotenv;
 
-// Environment variables yükle
-if (file_exists(__DIR__ . '/../.env')) {
-    $lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
-            list($key, $value) = explode('=', $line, 2);
-            $_ENV[trim($key)] = trim($value);
-        }
-    }
-}
+// .env dosyasını yükle (vlucas/phpdotenv ile)
+$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->load();
 
-$capsule = new Capsule;
-
-$capsule->addConnection([
+// Database konfigürasyonunu hazırla
+$config = [
     'driver'    => 'mysql',
     'host'      => $_ENV['DB_HOST'] ?? '127.0.0.1',
     'port'      => $_ENV['DB_PORT'] ?? '3306',
@@ -27,13 +19,7 @@ $capsule->addConnection([
     'prefix'    => '',
     'strict'    => true,
     'engine'    => null,
-    'options'   => [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-        PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
-    ],
-]);
+];
 
-$capsule->setAsGlobal();
-$capsule->bootEloquent();
+// Core\Database sınıfı ile Eloquent'i başlat
+\Core\Database::init($config);

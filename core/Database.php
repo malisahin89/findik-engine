@@ -65,7 +65,8 @@ class Database
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
                 PDO::ATTR_EMULATE_PREPARES => false,
-                PDO::ATTR_PERSISTENT => true, // Persistent connection
+                // Persistent connection sadece production'da (connection pool sorunlarını önlemek için)
+                PDO::ATTR_PERSISTENT => ($_ENV['APP_ENV'] ?? 'local') === 'production',
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES " . self::$config['charset']
             ]
         );

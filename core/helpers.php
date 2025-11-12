@@ -126,13 +126,13 @@ if (!function_exists('validate')) {
                     $ignoreId = $parts[2] ?? null;
 
                     // Güvenlik: Sadece izin verilen tablo ve kolon adlarını kabul et
-                    $allowedTables = ['users'];
-                    $allowedColumns = ['username', 'email'];
-                    
-                    if ($value !== '' && $table && $column && 
-                        in_array($table, $allowedTables) && 
+                    $allowedTables = ['users', 'posts'];
+                    $allowedColumns = ['username', 'email', 'slug'];
+
+                    if ($value !== '' && $table && $column &&
+                        in_array($table, $allowedTables) &&
                         in_array($column, $allowedColumns)) {
-                        
+
                         $query = \Illuminate\Database\Capsule\Manager::table($table)
                             ->where($column, $value);
 
@@ -164,12 +164,14 @@ if (!function_exists('auth')) {
 
 
 if (!function_exists('old')) {
-    function old($key, $default = '')
+    function old($key, $default = '', $escape = true)
     {
         if (!isset($_SESSION)) session_start();
         $old = $_SESSION['_old'] ?? [];
+        $value = $old[$key] ?? $default;
 
-        return $old[$key] ?? $default;
+        // XSS koruması: HTML encoding (default olarak açık)
+        return $escape ? htmlspecialchars($value, ENT_QUOTES, 'UTF-8') : $value;
     }
 }
 
@@ -193,12 +195,47 @@ if (!function_exists('cache')) {
         if ($key === null) {
             return new \Core\Cache();
         }
-        
+
         if ($value === null) {
             return \Core\Cache::get($key);
         }
-        
+
         return \Core\Cache::set($key, $value, $ttl);
+    }
+}
+
+if (!function_exists('getRealIP')) {
+    /**
+     * Gerçek IP adresini güvenli bir şekilde alır
+     * Proxy/load balancer arkasında bile doğru IP'yi döndürür
+     */
+    function getRealIP()
+    {
+        // Güvenilir proxy'ler listesi (deployment'a göre ayarlayın)
+        $trustedProxies = ['127.0.0.1', '::1'];
+
+        // Proxy arkasındaysak ve proxy güvenilirse X-Forwarded-For kullan
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
+            in_array($_SERVER['REMOTE_ADDR'], $trustedProxies)) {
+            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            $realIP = trim($ips[0]);
+
+            // IP validasyonu
+            if (filter_var($realIP, FILTER_VALIDATE_IP)) {
+                return $realIP;
+            }
+        }
+
+        // Cloudflare kullanılıyorsa
+        if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+            $cfIP = $_SERVER['HTTP_CF_CONNECTING_IP'];
+            if (filter_var($cfIP, FILTER_VALIDATE_IP)) {
+                return $cfIP;
+            }
+        }
+
+        // Normal durum - direkt IP
+        return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     }
 }
 

@@ -10,15 +10,10 @@ class VerifyCsrfToken
     {
         // Sadece POST, PUT, PATCH, DELETE gibi değişiklik yapılan metodlarda kontrol yap
         if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT', 'PATCH', 'DELETE'])) {
-            
-            // Login sayfasını hariç tut
-            $uri = rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-            if ($uri === '/admin/login') {
-                return $next($request);
-            }
-            
+
+            // CSRF token kontrolü (TÜM POST isteklerinde zorunlu)
             $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
-            
+
             if (!Csrf::check($token)) {
                 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
                     http_response_code(419);
@@ -26,11 +21,11 @@ class VerifyCsrfToken
                     echo json_encode(['error' => 'CSRF token mismatch']);
                     throw new \Core\CsrfException('CSRF token mismatch');
                 }
-                
+
                 throw new \Core\CsrfException('CSRF koruması: Token doğrulanamadı.');
             }
         }
-        
+
         return $next($request);
     }
 }

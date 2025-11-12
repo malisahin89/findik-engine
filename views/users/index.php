@@ -74,11 +74,13 @@
                                 <a href="<?= route('admin.users.edit') ?>?id=<?= $user->id ?>" class="text-indigo-600 hover:text-indigo-900 mr-4">
                                     <i class="fas fa-edit"></i> Düzenle
                                 </a>
-                                <a href="<?= route('admin.users.delete') ?>?id=<?= $user->id ?>" 
-                                   class="text-red-600 hover:text-red-900"
-                                   onclick="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')">
-                                    <i class="fas fa-trash"></i> Sil
-                                </a>
+                                <form method="POST" action="<?= route('admin.users.delete') ?>" style="display: inline;" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')">
+                                    <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                                    <input type="hidden" name="id" value="<?= $user->id ?>">
+                                    <button type="submit" class="text-red-600 hover:text-red-900 bg-transparent border-0 cursor-pointer">
+                                        <i class="fas fa-trash"></i> Sil
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         <?php endforeach; ?>

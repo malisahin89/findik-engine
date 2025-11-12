@@ -4,6 +4,7 @@ CREATE TABLE `posts` (
   `slug` varchar(255) NOT NULL,
   `content` longtext NOT NULL,
   `short_description` text,
+  `meta_keywords` varchar(500) DEFAULT NULL COMMENT 'SEO anahtar kelimeleri (virgülle ayrılmış)',
   `cover_image` varchar(255) DEFAULT NULL,
   `gallery_images` json DEFAULT NULL,
   `status` enum('draft','published') DEFAULT 'draft',
@@ -20,3 +21,6 @@ CREATE TABLE `posts` (
   KEY `user_id` (`user_id`),
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Mevcut tabloya meta_keywords alanı eklemek için:
+-- ALTER TABLE `posts` ADD COLUMN `meta_keywords` varchar(500) DEFAULT NULL COMMENT 'SEO anahtar kelimeleri (virgülle ayrılmış)' AFTER `short_description`;

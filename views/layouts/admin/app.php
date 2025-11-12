@@ -20,7 +20,10 @@
                 <div class="ml-4 flex items-center md:ml-6">
                     <?php if (auth()): ?>
                         <span class="mr-4">Hoş geldin, <?= htmlspecialchars(auth()->name) ?></span>
-                        <a href="<?= route('admin.logout') ?>" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm font-medium">Çıkış</a>
+                        <form method="POST" action="<?= route('admin.logout') ?>" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm font-medium text-white border-0 cursor-pointer">Çıkış</button>
+                        </form>
                     <?php endif; ?>
                 </div>
             </div>
@@ -39,7 +42,10 @@
             <a href="<?= route('admin.posts.index') ?>" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700">Blog</a>
             <a href="#" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700">Ayarlar</a>
             <?php if (auth()): ?>
-                <a href="<?= route('admin.logout') ?>" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700">Çıkış Yap</a>
+                <form method="POST" action="<?= route('admin.logout') ?>" class="block">
+                    <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                    <button type="submit" class="w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 bg-transparent text-gray-300 border-0 cursor-pointer">Çıkış Yap</button>
+                </form>
             <?php endif; ?>
         </div>
     </div>
@@ -72,11 +78,4 @@
 
     <?= $this->section('body') ?>
 </main>
-
-<script>
-function toggleMenu() {
-    const menu = document.getElementById('mobile-menu');
-    menu.classList.toggle('hidden');
-}
-</script>
 <?php $this->end() ?>

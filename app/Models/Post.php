@@ -14,6 +14,7 @@ class Post extends Model
         'slug',
         'content',
         'short_description',
+        'meta_keywords',
         'cover_image',
         'gallery_images',
         'status',
@@ -56,6 +57,6 @@ class Post extends Model
     // Relation: Yazar
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class);
     }
 }

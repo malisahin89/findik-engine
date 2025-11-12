@@ -65,7 +65,8 @@ class UserController
         // Resim yükleme
         if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
             try {
-                $userData['profile_image'] = FileUpload::upload($_FILES['profile_image'], 'uploads/profiles');
+                $customFilename = $request['username'] . '-pp';
+                $userData['profile_image'] = FileUpload::upload($_FILES['profile_image'], 'uploads/profiles', true, $customFilename);
             } catch (\Exception $e) {
                 View::render('users/create', [
                     'errors' => ['profile_image' => [$e->getMessage()]],
@@ -152,33 +153,52 @@ class UserController
             return;
         }
 
+        // Kullanıcıyı al
+        $user = User::find($userId);
+        if (!$user) {
+            flash('error', 'Kullanıcı bulunamadı!');
+            redirect('admin.users.index');
+            return;
+        }
+
         $data = $request;
         unset($data['id']); // ID'yi data'dan çıkar
 
         // Resim yükleme
         if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
             try {
-                $data['profile_image'] = FileUpload::upload($_FILES['profile_image'], 'uploads/profiles');
+                $oldImage = $user->profile_image ?? null;
+
+                // Yeni resmi yükle (username-pp formatında)
+                $customFilename = $request['username'] . '-pp';
+                $data['profile_image'] = FileUpload::upload($_FILES['profile_image'], 'uploads/profiles', true, $customFilename);
+
+                // Eski resmi sil (default.png değilse VE yeni dosya ile farklı ise)
+                if ($oldImage && $oldImage !== 'default.png' && $oldImage !== $data['profile_image']) {
+                    FileUpload::delete($oldImage);
+                }
             } catch (\Exception $e) {
-                $user = User::find($userId);
                 View::render('users/edit', [
                     'errors' => ['profile_image' => [$e->getMessage()]],
                     'user' => (object) array_merge((array) $user->toArray(), $request)
                 ]);
                 return;
             }
+        } else {
+            // Yeni resim yüklenmediyse ama username değiştiyse, mevcut resmi yeniden adlandır
+            $usernameChanged = ($user->username !== $request['username']);
+            if ($usernameChanged && $user->profile_image && $user->profile_image !== 'default.png') {
+                $newFilename = $request['username'] . '-pp';
+                $newPath = FileUpload::rename($user->profile_image, $newFilename);
+                if ($newPath) {
+                    $data['profile_image'] = $newPath;
+                }
+            }
         }
 
         // Şifre boşsa sil (User model'de otomatik hash'leniyor)
         if (empty($data['password'])) {
             unset($data['password']);
-        }
-
-        $user = User::find($userId);
-        if (!$user) {
-            flash('error', 'Kullanıcı bulunamadı!');
-            redirect('admin.users.index');
-            return;
         }
         
         $user->update($data);
@@ -204,25 +224,30 @@ class UserController
             redirect('admin.users.index');
             return;
         }
-        
+
         $user = User::find($id);
         if (!$user) {
             flash('error', 'Kullanıcı bulunamadı!');
             redirect('admin.users.index');
             return;
         }
-        
+
+        // Kullanıcının profil resmini sil (default.png değilse)
+        if ($user->profile_image && $user->profile_image !== 'default.png') {
+            FileUpload::delete($user->profile_image);
+        }
+
         User::destroy($id);
-        
+
         // Cache'i temizle
         Cache::forget('users_list');
         Cache::forget('home_users_list');
-        
+
         Logger::warning('User deleted', [
             'deleted_user_id' => $id,
             'deleted_by' => $_SESSION['user_id'] ?? 'unknown'
         ]);
-        
+
         flash('success', 'Kullanıcı başarıyla silindi!');
         redirect('admin.users.index');
     }
